@@ -1,0 +1,1 @@
+This module helps to map the telugu words into english
