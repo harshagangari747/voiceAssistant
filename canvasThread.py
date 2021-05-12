@@ -1,9 +1,11 @@
+import tkinter
 import speech_recognition as sr
 import threading
 from tkinter import *
 from time import sleep
 from math import *
 import sys
+from PIL import Image,ImageTk
 def takeCommand():
     r = sr.Recognizer() 
     with sr.Microphone() as source:
@@ -32,22 +34,37 @@ class Drawing :
     def __init__(self):
         self.root = Tk()
         self.root.geometry('400x400')
+        self.root.title("Canvas Drawing")
         self.root.resizable(width=False,height=False)
-        # self.draw()
+        self.root.config(background="beige")
+        
+        
+        #self.draw()
     # def draw(self) :
-        self.canvas = Canvas(self.root,width=300,height=300,highlightthickness=1, highlightbackground="black")
+        # self.canvas = Canvas(self.root,width=300,height=300,highlightthickness=1, highlightbackground="black",background='white')
+        # self.canvas.place(x=300,y=300)
+        # self.canvas.pack(pady=50,side="bottom",expand = False)
+        
+       
+        
+    def run(self) :
+        load = Image.open(r"C:\Users\user\OneDrive\Desktop\Final Project\Python files\axes.png")
+        render = ImageTk.PhotoImage(load)
+        img = Label(image=render)
+        img.image = render
+        img.place(x=20, y=32,anchor=NW)
+        self.canvas = Canvas(self.root,width=300,height=300,highlightthickness=1, highlightbackground="black",background='white')
         self.canvas.place(x=300,y=300)
         self.canvas.pack(pady=50,side="bottom",expand = False)
-    
-    def run(self) :
         self.root.bind()
+
         self.root.mainloop()
         
     
     def figures(self) : 
         fig ="" 
         while fig!="exit" :
-            fig = takeCommand().split()
+            fig = input().split()
             print("In class", str(fig))
             try :
                 if fig[0] == "circle" :
