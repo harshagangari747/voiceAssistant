@@ -6,6 +6,7 @@ from time import sleep
 from math import *
 import sys
 from PIL import Image,ImageTk
+import os
 def takeCommand():
     r = sr.Recognizer() 
     with sr.Microphone() as source:
@@ -20,7 +21,6 @@ def takeCommand():
         print("Unable to Recognize your voice.")
         return "None"
     return query
-
 class Drawing :
     circles=[]
     circles.append(None)
@@ -30,23 +30,12 @@ class Drawing :
     rectangles.append(None)
     ovals=[]
     ovals.append(None)
-
     def __init__(self):
         self.root = Tk()
         self.root.geometry('400x400')
         self.root.title("Canvas Drawing")
         self.root.resizable(width=False,height=False)
         self.root.config(background="beige")
-        
-        
-        #self.draw()
-    # def draw(self) :
-        # self.canvas = Canvas(self.root,width=300,height=300,highlightthickness=1, highlightbackground="black",background='white')
-        # self.canvas.place(x=300,y=300)
-        # self.canvas.pack(pady=50,side="bottom",expand = False)
-        
-       
-        
     def run(self) :
         load = Image.open(r"C:\Users\user\OneDrive\Desktop\Final Project\Python files\axes.png")
         render = ImageTk.PhotoImage(load)
@@ -57,14 +46,11 @@ class Drawing :
         self.canvas.place(x=300,y=300)
         self.canvas.pack(pady=50,side="bottom",expand = False)
         self.root.bind()
-
         self.root.mainloop()
-        
-    
     def figures(self) : 
         fig ="" 
         while fig!="exit" :
-            fig = input().split()
+            fig = takeCommand().split()
             print("In class", str(fig))
             try :
                 if fig[0] == "circle" :
@@ -73,8 +59,6 @@ class Drawing :
                     self.lines.append(self.canvas.create_line(fig[4],fig[6],int(fig[4])+int(fig[2]),fig[6]))
                 elif fig[0] == "rectangle" :
                     self.rectangles.append(self.canvas.create_rectangle(int(fig[7])-int(fig[2])/2,int(fig[9])-int(fig[4])/2,int(fig[7])+int(fig[2])/2,int(fig[9])+int(fig[4])/2))
-                # elif fig[0] == "ellipse" :
-                #     self.ovals.append(self.canvas.create_oval((int(fig[1])-int(fig[4])), (int(fig[2])+int(fig[3])),(int(fig[1])+int(fig[4])),(int(fig[2])-int(fig[3])),outline="black"))
                 elif fig[0] == "delete" :
                     self.deleteFig(fig)
                 elif fig[0] == "rotate" :
@@ -86,14 +70,11 @@ class Drawing :
                     self.move(fig[1],int(fig[2]),int(fig[4]),int(fig[6]))
                 elif fig[0] == "colour" or fig[0] == "Colour":
                     self.Color(fig[1],int(self.numMap(fig[2])),fig[3])
-
                 elif fig[0]=="exit" :
                     self.root.destroy()
                     return 0
-                    
             except Exception as e :
                 print(e)
-    
     def numMap(self,number) :
         switcher = {
             "zero" : 0,
@@ -119,7 +100,6 @@ class Drawing :
             '9':9,
         }
         return switcher.get(number,'invalid number')
-
     def deleteAll(self,name) :
         if name == 'circles' :
             for j in range(0,len(self.circles)) :
@@ -130,10 +110,6 @@ class Drawing :
         if name == 'rectangles' :
             for j in range(0,len(self.rectangles)) :
                 self.canvas.delete(self.rectangles[j])
-        # if name == 'ovals' :
-        #     for j in range(0,len(self.ovals)) :
-        #         self.canvas.delete(self.ovals[j])
-
     def deleteFig(self,name) :
         print("In delete :  ",name[0],name[1],name[2])
         if name[1]!= "all" :
@@ -144,27 +120,20 @@ class Drawing :
                 self.canvas.delete(self.lines[i])
             elif name[1] == "rectangle" :
                 self.canvas.delete(self.rectangles[i])
-            # elif name[1] == "egg" :
-            #     self.canvas.delete(self.ovals[i])
         elif name[1]=="all" :
             self.deleteAll(name[2])
-    
     def rotateFig(self,name,num,angle) :
         if name =="line" :
             pts=list(self.canvas.coords(self.lines[num]))
-            
             midx,midy = (pts[0]+pts[2])/2,(pts[1]+pts[3])/2
             newx1 = (pts[0]-midx)*cos(radians(angle))-(pts[1]-midy)*sin(radians(angle))+midx
             newy1 = (pts[0]-midx)*sin(radians(angle))+(pts[1]-midy)*cos(radians(angle))+midy
-
             newx2 = (pts[2]-midx)*cos(radians(angle))-(pts[3]-midy)*sin(radians(angle))+midx
             newy2 = (pts[2]-midx)*sin(radians(angle))+(pts[3]-midy)*cos(radians(angle))+midy
-
             print(newx1,newy1,newx2,newy2)
             self.canvas.delete(self.lines[num])
             self.lines[num]=None
             self.lines[num] = (self.canvas.create_line(newx1,newy1,newx2,newy2))
-
         elif name =="rectangle" :
             pts=list(self.canvas.coords(self.rectangles[num]))
             print(pts)
@@ -174,16 +143,6 @@ class Drawing :
             print(midx,midy,len,bre)
             self.canvas.delete(self.rectangles[num])
             self.rectangles[num] =self.canvas.create_rectangle(midx-(bre/2),midy-(len/2),midx+(bre/2),midy+(len/2),fill=fillColor)
-        # elif name == "oval" :
-        #     pts=list(self.canvas.coords(self.ovals[num]))
-        #     print(pts)
-        #     midx,midy = (pts[0]+pts[2])/2,(pts[1]+pts[3])/2
-        #     len,bre = abs(pts[0]-pts[2]),abs(pts[1]-pts[3])
-        #     print(midx,midy,len,bre)
-        #     self.canvas.delete(self.ovals[num])
-        #     self.ovals[num] = None
-        #     self.ovals[num] = self.canvas.create_oval(midx-(bre/2),midy-(len/2),midx+(bre/2),midy+(len/2))
-
     def move(self,name,num,x,y) :
         if name=="line" :
             pts=list(self.canvas.coords(self.lines[num]))
@@ -214,14 +173,6 @@ class Drawing :
             self.canvas.delete(self.circles[num])
             self.circles[num] = None
             self.circles[num] = self.canvas.create_oval(int(x-radius),int(y-radius),int(x+radius),int(y+radius),outline="black",fill=fillColor)
-        # elif name=="oval" :
-        #     pts=list(self.canvas.coords(self.ovals[num]))
-        #     print(pts)
-        #     a,b = abs(pts[1]-pts[3])/2,abs(pts[0]-pts[2])/2
-        #     self.canvas.delete(self.ovals[num])
-        #     self.ovals[num] = None
-        #     self.ovals[num] = self.canvas.create_oval(int(x-b),int(y-a),int(x+b),int(y+a),outline="black")
-    
     def Color(self,name,num,color) :
         if name=="circle" :
             self.canvas.itemconfig(self.circles[num],fill=color)
@@ -229,26 +180,18 @@ class Drawing :
             self.canvas.itemconfig(self.rectangles[num],fill=color)
         elif name == "egg" :
             self.canvas.itemconfig(self.ovals[num],fill=color)
-        
 def OpenWindow() :
     comm=""
     x=Drawing()
-        # comm = takeCommand().lower()
     print("In main " + comm)
-        # if comm == "canvas" or comm == "Canvas" :
-            # thread = threading.Thread(target=x.draw)
     thread1 = threading.Thread(target=x.figures)
-            # thread.start()
-            # sleep(0.3)
     thread1.start()
     x.run()
-            # thread.join()
-    comm = takeCommand().lower()
     if thread1.is_alive()!=True :
         thread1.join()
+    processid =os.getpid()
+    os.system('TASKKILL /F /PID '+ str(processid))
     sys.exit("exited")
-            
-
 if __name__ == '__main__' :
     OpenWindow()
     
